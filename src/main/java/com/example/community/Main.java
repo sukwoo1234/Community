@@ -6,11 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main {
-    private static Database database = new Database();
-    private static User currentUser;
-    private static JFrame frame;
+    private static Database database = new Database(); // 데이터베이스 객체 생성
+    private static User currentUser; // 현재 로그인한 사용자
+    private static JFrame frame; // 메인 프레임
+    private static JTextArea contentArea; // 게시글 내용 입력 영역
 
     public static void main(String[] args) {
+        User.loadUsers(); // 사용자 로드
         frame = new JFrame("익명 커뮤니티");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
@@ -22,6 +24,7 @@ public class Main {
         JButton loginButton = new JButton("로그인");
         JButton registerButton = new JButton("회원가입");
 
+        // 로그인 패널 구성
         loginPanel.add(new JLabel("사용자명:"));
         loginPanel.add(usernameField);
         loginPanel.add(new JLabel("비밀번호:"));
@@ -31,44 +34,39 @@ public class Main {
 
         // 게시글 작성 패널
         JPanel postPanel = new JPanel();
-        JTextField titleField = new JTextField(15);
-        JTextArea contentArea = new JTextArea(5, 20);
+        JTextField titleField = new JTextField(15); // 제목 입력 필드
+        contentArea = new JTextArea(5, 20); // 내용 입력 필드
         JButton postButton = new JButton("게시글 작성");
         JButton viewPostsButton = new JButton("게시글 보기");
         JButton backToLoginButton = new JButton("돌아가기");
 
+        // 게시글 작성 패널 구성
         postPanel.add(new JLabel("제목:"));
         postPanel.add(titleField);
         postPanel.add(new JLabel("내용:"));
-        postPanel.add(new JScrollPane(contentArea));
+        postPanel.add(new JScrollPane(contentArea)); // 스크롤 가능한 영역
         postPanel.add(postButton);
         postPanel.add(viewPostsButton);
         postPanel.add(backToLoginButton);
 
         // 게시글 보기 패널
         JPanel viewPanel = new JPanel();
-        DefaultListModel<Post> postListModel = new DefaultListModel<>();
-        JList<Post> postList = new JList<>(postListModel);
+        DefaultListModel<Post> postListModel = new DefaultListModel<>(); // 게시글 리스트 모델
+        JList<Post> postList = new JList<>(postListModel); // 게시글 리스트
         JButton backToPostButton = new JButton("게시글 작성하기");
-        JButton viewPostButton = new JButton("게시글 보기");
 
+        // 게시글 보기 패널 구성
         viewPanel.setLayout(new BorderLayout());
-        viewPanel.add(new JScrollPane(postList), BorderLayout.CENTER);
+        viewPanel.add(new JScrollPane(postList), BorderLayout.CENTER); // 게시글 리스트를 중앙에 배치
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(backToPostButton);
+        buttonPanel.add(backToPostButton); // 돌아가기 버튼 추가
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // 댓글 달기 패널
-        JPanel commentPanel = new JPanel();
-        JTextArea commentArea = new JTextArea(3, 40);
-        JButton commentButton = new JButton("댓글 달기");
-        JTextField postIdField = new JTextField(5);
-
-        commentPanel.add(new JLabel("게시글 ID:"));
-        commentPanel.add(postIdField);
-        commentPanel.add(new JLabel("댓글:"));
-        commentPanel.add(new JScrollPane(commentArea));
-        commentPanel.add(commentButton);
+        // 게시글 내용 표시 패널
+        JPanel contentPanel = new JPanel();
+        JTextArea postContentArea = new JTextArea(10, 40); // 읽기 전용 게시글 내용
+        postContentArea.setEditable(false); // 수정 불가
+        contentPanel.add(new JScrollPane(postContentArea)); // 스크롤 가능한 영역
 
         // 이벤트 리스너
         loginButton.addActionListener(new ActionListener() {
@@ -79,7 +77,7 @@ public class Main {
                 if (User.login(username, password)) {
                     currentUser = new User(username, password);
                     JOptionPane.showMessageDialog(frame, "로그인 성공");
-                    frame.setContentPane(postPanel);
+                    frame.setContentPane(postPanel); // 게시글 작성 화면으로 전환
                     frame.revalidate();
                 } else {
                     JOptionPane.showMessageDialog(frame, "로그인 실패");
@@ -106,7 +104,7 @@ public class Main {
                 String title = titleField.getText();
                 String content = contentArea.getText();
                 Post post = new Post(title, content);
-                database.addPost(post);
+                database.addPost(post); // 게시글 추가
                 titleField.setText("");
                 contentArea.setText("");
                 JOptionPane.showMessageDialog(frame, "게시글이 작성되었습니다.");
@@ -116,11 +114,11 @@ public class Main {
         viewPostsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                postListModel.clear();
+                postListModel.clear(); // 리스트 초기화
                 for (Post post : database.getPosts()) {
-                    postListModel.addElement(post);
+                    postListModel.addElement(post); // 게시글 제목 추가
                 }
-                frame.setContentPane(viewPanel);
+                frame.setContentPane(viewPanel); // 게시글 보기 화면으로 전환
                 frame.revalidate();
             }
         });
@@ -128,33 +126,18 @@ public class Main {
         backToPostButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                frame.setContentPane(postPanel);
+                frame.setContentPane(postPanel); // 게시글 작성 화면으로 전환
                 frame.revalidate();
             }
         });
 
         postList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                Post selectedPost = postList.getSelectedValue();
+                Post selectedPost = postList.getSelectedValue(); // 선택된 게시글
                 if (selectedPost != null) {
-                    JOptionPane.showMessageDialog(frame,
-                            "제목: " + selectedPost.getTitle() + "\n내용: " + selectedPost.getContent());
-                }
-            }
-        });
-
-        commentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int postId = Integer.parseInt(postIdField.getText());
-                String commentText = commentArea.getText();
-                Post post = database.getPostById(postId);
-                if (post != null) {
-                    post.addComment(new Comment(commentText));
-                    JOptionPane.showMessageDialog(frame, "댓글이 달렸습니다.");
-                    commentArea.setText("");
-                } else {
-                    JOptionPane.showMessageDialog(frame, "유효하지 않은 게시글 ID입니다.");
+                    postContentArea.setText("제목: " + selectedPost.getTitle() + "\n\n내용: " + selectedPost.getContent());
+                    frame.setContentPane(contentPanel); // 게시글 내용 화면으로 전환
+                    frame.revalidate();
                 }
             }
         });

@@ -1,5 +1,6 @@
 package com.example.community;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +14,34 @@ public class Post {
     public Post(String title, String content) {
         this.id = idCounter++;
         this.title = title;
-        this.content = sanitizeContent(content); // XSS 방지 대체 처리
+        this.content = content;
         this.comments = new ArrayList<>();
     }
 
-    // XSS 방지를 위한 간단한 콘텐츠 정리 메서드
-    private String sanitizeContent(String content) {
-        return content.replaceAll("<", "&lt;").replaceAll(">", "&gt;"); // HTML 태그 변환
+    public static void loadPosts(List<Post> posts) {
+        try (BufferedReader br = new BufferedReader(new FileReader("posts.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",", 3); // 제목과 내용을 ','로 구분
+                if (parts.length >= 2) {
+                    Post post = new Post(parts[0], parts[1]);
+                    posts.add(post);
+                }
+            }
+        } catch (IOException e) {
+            // 파일이 없으면 무시
+        }
+    }
+
+    public static void savePosts(List<Post> posts) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("posts.txt"))) {
+            for (Post post : posts) {
+                bw.write(post.getTitle() + "," + post.getContent());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getId() {
@@ -44,6 +66,6 @@ public class Post {
 
     @Override
     public String toString() {
-        return "ID: " + id + ", 제목: " + title + "\n내용: " + content + "\n";
+        return title; // 제목만 보여줌
     }
 }

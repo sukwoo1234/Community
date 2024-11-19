@@ -8,10 +8,12 @@ public class Database {
 
     public Database() {
         posts = new ArrayList<>();
+        Post.loadPosts(posts); // 게시글 로드
     }
 
     public void addPost(Post post) {
         posts.add(post);
+        Post.savePosts(posts); // 게시글 저장
     }
 
     public List<Post> getPosts() {
