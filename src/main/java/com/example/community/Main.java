@@ -47,17 +47,16 @@ public class Main {
 
         // 게시글 보기 패널
         JPanel viewPanel = new JPanel();
-        JTextArea postArea = new JTextArea(10, 40);
-        postArea.setEditable(false);
-        JButton searchButton = new JButton("검색");
-        JTextField searchField = new JTextField(15);
+        DefaultListModel<Post> postListModel = new DefaultListModel<>();
+        JList<Post> postList = new JList<>(postListModel);
+        JButton backToPostButton = new JButton("게시글 작성하기");
+        JButton viewPostButton = new JButton("게시글 보기");
 
         viewPanel.setLayout(new BorderLayout());
-        viewPanel.add(new JScrollPane(postArea), BorderLayout.CENTER);
-        JPanel searchPanel = new JPanel();
-        searchPanel.add(searchField);
-        searchPanel.add(searchButton);
-        viewPanel.add(searchPanel, BorderLayout.NORTH);
+        viewPanel.add(new JScrollPane(postList), BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(backToPostButton);
+        viewPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // 댓글 달기 패널
         JPanel commentPanel = new JPanel();
@@ -117,35 +116,30 @@ public class Main {
         viewPostsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                StringBuilder displayText = new StringBuilder();
+                postListModel.clear();
                 for (Post post : database.getPosts()) {
-                    displayText.append(post.toString()).append("\n");
+                    postListModel.addElement(post);
                 }
-                postArea.setText(displayText.toString());
                 frame.setContentPane(viewPanel);
                 frame.revalidate();
             }
         });
 
-        backToLoginButton.addActionListener(new ActionListener() {
+        backToPostButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                frame.setContentPane(loginPanel);
+                frame.setContentPane(postPanel);
                 frame.revalidate();
             }
         });
 
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String keyword = searchField.getText();
-                StringBuilder result = new StringBuilder();
-                for (Post post : database.getPosts()) {
-                    if (post.getTitle().contains(keyword) || post.getContent().contains(keyword)) {
-                        result.append(post.toString()).append("\n");
-                    }
+        postList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                Post selectedPost = postList.getSelectedValue();
+                if (selectedPost != null) {
+                    JOptionPane.showMessageDialog(frame,
+                            "제목: " + selectedPost.getTitle() + "\n내용: " + selectedPost.getContent());
                 }
-                postArea.setText(result.length() > 0 ? result.toString() : "검색 결과가 없습니다.");
             }
         });
 
