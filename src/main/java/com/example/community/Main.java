@@ -66,7 +66,21 @@ public class Main {
         JPanel contentPanel = new JPanel();
         JTextArea postContentArea = new JTextArea(10, 40); // 읽기 전용 게시글 내용
         postContentArea.setEditable(false); // 수정 불가
+        JButton goBackButton = new JButton("뒤로 가기"); // 뒤로 가기 버튼 추가
         contentPanel.add(new JScrollPane(postContentArea)); // 스크롤 가능한 영역
+        contentPanel.add(goBackButton); // 뒤로 가기 버튼 추가
+
+        // 댓글 입력 패널
+        JPanel commentPanel = new JPanel();
+        JTextField commentField = new JTextField(30); // 댓글 입력 필드
+        JButton commentButton = new JButton("댓글 달기"); // 댓글 달기 버튼
+        commentPanel.add(commentField);
+        commentPanel.add(commentButton);
+
+        // 댓글 보기 영역
+        JTextArea commentArea = new JTextArea(5, 30); // 댓글 보기 영역
+        commentArea.setEditable(false); // 수정 불가
+        contentPanel.add(new JScrollPane(commentArea)); // 스크롤 가능한 영역
 
         // 이벤트 리스너
         loginButton.addActionListener(new ActionListener() {
@@ -136,8 +150,38 @@ public class Main {
                 Post selectedPost = postList.getSelectedValue(); // 선택된 게시글
                 if (selectedPost != null) {
                     postContentArea.setText("제목: " + selectedPost.getTitle() + "\n\n내용: " + selectedPost.getContent());
+                    commentArea.setText(""); // 이전 댓글 초기화
+                    for (Comment comment : selectedPost.getComments()) {
+                        commentArea.append(comment.getText() + "\n"); // 댓글 추가
+                    }
+                    contentPanel.add(commentPanel); // 댓글 입력 패널 추가
                     frame.setContentPane(contentPanel); // 게시글 내용 화면으로 전환
                     frame.revalidate();
+                }
+            }
+        });
+
+        goBackButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.setContentPane(viewPanel); // 게시글 보기 화면으로 돌아가기
+                frame.revalidate();
+            }
+        });
+
+        commentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Post selectedPost = postList.getSelectedValue(); // 선택된 게시글
+                if (selectedPost != null) {
+                    String commentText = commentField.getText();
+                    if (!commentText.trim().isEmpty()) {
+                        selectedPost.addComment(new Comment(commentText)); // 댓글 추가
+                        commentField.setText(""); // 입력 필드 초기화
+                        commentArea.append(commentText + "\n"); // 댓글 영역에 추가
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "댓글 내용을 입력하세요."); // 빈 댓글 방지
+                    }
                 }
             }
         });
