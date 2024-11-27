@@ -54,12 +54,14 @@ public class Main {
         DefaultListModel<Post> postListModel = new DefaultListModel<>(); // 게시글 리스트 모델
         JList<Post> postList = new JList<>(postListModel); // 게시글 리스트
         JButton backToPostButton = new JButton("게시글 작성하기");
+        JButton logoutButton = new JButton("로그아웃"); // 로그아웃 버튼 추가
 
         // 게시글 보기 패널 구성
         viewPanel.setLayout(new BorderLayout());
         viewPanel.add(new JScrollPane(postList), BorderLayout.CENTER); // 게시글 리스트를 중앙에 배치
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(backToPostButton); // 돌아가기 버튼 추가
+        buttonPanel.add(logoutButton); // 로그아웃 버튼 추가
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // 게시글 내용 표시 패널
@@ -141,6 +143,15 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.setContentPane(postPanel); // 게시글 작성 화면으로 전환
+                frame.revalidate();
+            }
+        });
+
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentUser = null; // 현재 사용자 로그아웃
+                frame.setContentPane(loginPanel); // 로그인 화면으로 전환
                 frame.revalidate();
             }
         });
