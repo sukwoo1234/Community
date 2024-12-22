@@ -93,7 +93,12 @@ public class Main {
                 if (User.login(username, password)) {
                     currentUser = new User(username, password);
                     JOptionPane.showMessageDialog(frame, "로그인 성공");
-                    frame.setContentPane(postPanel); // 게시글 작성 화면으로 전환
+                    // 로그인 후 게시글 목록 화면으로 전환
+                    postListModel.clear(); // 리스트 초기화
+                    for (Post post : database.getPosts()) {
+                        postListModel.addElement(post); // 게시글 제목 추가
+                    }
+                    frame.setContentPane(viewPanel); // 게시글 보기 화면으로 전환
                     frame.revalidate();
                 } else {
                     JOptionPane.showMessageDialog(frame, "로그인 실패");
