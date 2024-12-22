@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main {
-    private static Database database = new Database(); // 데이터베이스 객체 생성
+    private static final Database database = new Database(); // 데이터베이스 객체 생성
     private static User currentUser; // 현재 로그인한 사용자
     private static JFrame frame; // 메인 프레임
     private static JTextArea contentArea; // 게시글 내용 입력 영역
@@ -85,80 +85,62 @@ public class Main {
         contentPanel.add(new JScrollPane(commentArea)); // 스크롤 가능한 영역
 
         // 이벤트 리스너
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-                if (User.login(username, password)) {
-                    currentUser = new User(username, password);
-                    JOptionPane.showMessageDialog(frame, "로그인 성공");
-                    // 로그인 후 게시글 목록 화면으로 전환
-                    postListModel.clear(); // 리스트 초기화
-                    for (Post post : database.getPosts()) {
-                        postListModel.addElement(post); // 게시글 제목 추가
-                    }
-                    frame.setContentPane(viewPanel); // 게시글 보기 화면으로 전환
-                    frame.revalidate();
-                } else {
-                    JOptionPane.showMessageDialog(frame, "로그인 실패");
-                }
-            }
-        });
-
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-                if (User.register(username, password)) {
-                    JOptionPane.showMessageDialog(frame, "회원가입 성공");
-                } else {
-                    JOptionPane.showMessageDialog(frame, "이미 존재하는 사용자");
-                }
-            }
-        });
-
-        postButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String title = titleField.getText();
-                String content = contentArea.getText();
-                Post post = new Post(title, content);
-                database.addPost(post); // 게시글 추가
-                titleField.setText("");
-                contentArea.setText("");
-                JOptionPane.showMessageDialog(frame, "게시글이 작성되었습니다.");
-            }
-        });
-
-        viewPostsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        loginButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            if (User.login(username, password)) {
+                currentUser = new User(username, password);
+                JOptionPane.showMessageDialog(frame, "로그인 성공");
+                // 로그인 후 게시글 목록 화면으로 전환
                 postListModel.clear(); // 리스트 초기화
                 for (Post post : database.getPosts()) {
                     postListModel.addElement(post); // 게시글 제목 추가
                 }
                 frame.setContentPane(viewPanel); // 게시글 보기 화면으로 전환
                 frame.revalidate();
+            } else {
+                JOptionPane.showMessageDialog(frame, "로그인 실패");
             }
         });
 
-        backToPostButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.setContentPane(postPanel); // 게시글 작성 화면으로 전환
-                frame.revalidate();
+        registerButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            if (User.register(username, password)) {
+                JOptionPane.showMessageDialog(frame, "회원가입 성공");
+            } else {
+                JOptionPane.showMessageDialog(frame, "이미 존재하는 사용자");
             }
         });
 
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                currentUser = null; // 현재 사용자 로그아웃
-                frame.setContentPane(loginPanel); // 로그인 화면으로 전환
-                frame.revalidate();
+        postButton.addActionListener(e -> {
+            String title = titleField.getText();
+            String content = contentArea.getText();
+            Post post = new Post(title, content);
+            database.addPost(post); // 게시글 추가
+            titleField.setText("");
+            contentArea.setText("");
+            JOptionPane.showMessageDialog(frame, "게시글이 작성되었습니다.");
+        });
+
+        viewPostsButton.addActionListener(e -> {
+            postListModel.clear(); // 리스트 초기화
+            for (Post post : database.getPosts()) {
+                postListModel.addElement(post); // 게시글 제목 추가
             }
+            frame.setContentPane(viewPanel); // 게시글 보기 화면으로 전환
+            frame.revalidate();
+        });
+
+        backToPostButton.addActionListener(e -> {
+            frame.setContentPane(postPanel); // 게시글 작성 화면으로 전환
+            frame.revalidate();
+        });
+
+        logoutButton.addActionListener(e -> {
+            currentUser = null; // 현재 사용자 로그아웃
+            frame.setContentPane(loginPanel); // 로그인 화면으로 전환
+            frame.revalidate();
         });
 
         postList.addListSelectionListener(e -> {
@@ -177,30 +159,24 @@ public class Main {
             }
         });
 
-        goBackButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.setContentPane(viewPanel); // 게시글 보기 화면으로 돌아가기
-                frame.revalidate();
-            }
+        goBackButton.addActionListener(e -> {
+            frame.setContentPane(viewPanel); // 게시글 보기 화면으로 돌아가기
+            frame.revalidate();
         });
 
         // 댓글 달기 버튼 클릭 이벤트 리스너
-        commentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Post selectedPost = postList.getSelectedValue(); // 선택된 게시글
-                if (selectedPost != null) {
-                    String commentText = commentField.getText();
-                    if (!commentText.trim().isEmpty()) {
-                        selectedPost.addComment(new Comment(commentText)); // 댓글 추가
-                        commentField.setText(""); // 입력 필드 초기화
-                        commentArea.append(commentText + "\n"); // 댓글 영역에 추가
-                        // 게시글 및 댓글 저장
-                        database.savePosts(database.getPosts()); // 모든 게시글과 댓글 저장
-                    } else {
-                        JOptionPane.showMessageDialog(frame, "댓글 내용을 입력하세요."); // 빈 댓글 방지
-                    }
+        commentButton.addActionListener(e -> {
+            Post selectedPost = postList.getSelectedValue(); // 선택된 게시글
+            if (selectedPost != null) {
+                String commentText = commentField.getText();
+                if (!commentText.trim().isEmpty()) {
+                    selectedPost.addComment(new Comment(commentText)); // 댓글 추가
+                    commentField.setText(""); // 입력 필드 초기화
+                    commentArea.append(commentText + "\n"); // 댓글 영역에 추가
+                    // 게시글 및 댓글 저장
+                    database.savePosts(database.getPosts()); // 모든 게시글과 댓글 저장
+                } else {
+                    JOptionPane.showMessageDialog(frame, "댓글 내용을 입력하세요."); // 빈 댓글 방지
                 }
             }
         });

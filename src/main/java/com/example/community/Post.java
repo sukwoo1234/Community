@@ -6,10 +6,10 @@ import java.util.List;
 
 public class Post {
     private static int idCounter = 1;
-    private int id;
-    private String title;
-    private String content;
-    private List<Comment> comments;
+    private final int id;
+    private final String title;
+    private final String content;
+    private final List<Comment> comments;
 
     public Post(String title, String content) {
         this.id = idCounter++;
