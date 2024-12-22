@@ -30,16 +30,21 @@
   2. 게시글 작성 및 조회
   3. 댓글 추가 및 조회
   4. 데이터베이스 저장 및 관리
-
+![github1](https://github.com/sukwoo1234/Community/blob/master/github1.png)
 
 
 ### 3.2 클래스 다이어그램
 - 본 프로그램의 주요 클래스 다이어그램은 다음과 같습니다:
   - **Main**: 애플리케이션의 흐름을 제어하고 UI를 관리합니다.
+  - ![github2](https://github.com/sukwoo1234/Community/blob/master/github2.png)
   - **Post**: 게시글 정보를 저장하고 관리합니다.
+  - ![github3](https://github.com/sukwoo1234/Community/blob/master/github3.png)
   - **User**: 사용자 정보를 관리하고 인증 기능을 제공합니다.
+  - ![github4](https://github.com/sukwoo1234/Community/blob/master/github4.png)
   - **Database**: 게시글의 데이터를 관리하고 댓글 기능을 포함합니다.
+  - ![github5](https://github.com/sukwoo1234/Community/blob/master/github5.png)
   - **Comment**: 게시글에 달린 댓글을 나타내고 관리합니다.
+  - ![github6](https://github.com/sukwoo1234/Community/blob/master/github6.png)
 
 ### 3.3 절차 설명
 1. **로그인 및 인증**:
