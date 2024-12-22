@@ -15,6 +15,10 @@ public class Database {
         posts.add(post);
         Post.savePosts(posts); // 게시글 저장
     }
+    public void savePosts(List<Post> posts) {
+        Post.savePosts(posts); // 게시글과 댓글 저장
+    }
+
 
     public List<Post> getPosts() {
         return posts;

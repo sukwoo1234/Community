@@ -185,6 +185,7 @@ public class Main {
             }
         });
 
+        // 댓글 달기 버튼 클릭 이벤트 리스너
         commentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -195,12 +196,15 @@ public class Main {
                         selectedPost.addComment(new Comment(commentText)); // 댓글 추가
                         commentField.setText(""); // 입력 필드 초기화
                         commentArea.append(commentText + "\n"); // 댓글 영역에 추가
+                        // 게시글 및 댓글 저장
+                        database.savePosts(database.getPosts()); // 모든 게시글과 댓글 저장
                     } else {
                         JOptionPane.showMessageDialog(frame, "댓글 내용을 입력하세요."); // 빈 댓글 방지
                     }
                 }
             }
         });
+
 
         // 초기 화면 설정
         frame.add(loginPanel);

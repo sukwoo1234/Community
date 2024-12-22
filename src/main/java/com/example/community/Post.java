@@ -51,6 +51,7 @@ public class Post {
                 String[] parts = line.split(",", 3); // 제목과 내용을 ','로 구분
                 if (parts.length >= 2) {
                     Post post = new Post(parts[0], parts[1]);
+                    loadComments(post); // 댓글 로드
                     posts.add(post);
                 }
             }
@@ -65,9 +66,34 @@ public class Post {
             for (Post post : posts) {
                 bw.write(post.getTitle() + "," + post.getContent());
                 bw.newLine();
+                saveComments(post); // 댓글 저장
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // 댓글 저장 메서드
+    private static void saveComments(Post post) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("comments_" + post.getId() + ".txt"))) {
+            for (Comment comment : post.getComments()) {
+                bw.write(comment.getText());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 댓글 로드 메서드
+    private static void loadComments(Post post) {
+        try (BufferedReader br = new BufferedReader(new FileReader("comments_" + post.getId() + ".txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                post.addComment(new Comment(line));
+            }
+        } catch (IOException e) {
+            // 댓글 파일이 없으면 무시
         }
     }
 }
